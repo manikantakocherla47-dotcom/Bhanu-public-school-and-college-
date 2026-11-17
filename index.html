@@ -1,35 +1,189 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bhanu Public School & Junior College - Mobile App</title>
+    <title>Bhanu Public School - Student Portal</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #f0f4f8; color: #333; }
-        .app-header { background: #1e3a8a; color: white; padding: 20px; text-align: center; }
-        .container { padding: 15px; max-width: 600px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn { display: block; width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; text-align: center; text-decoration: none; margin-top: 10px; cursor: pointer; }
-        .btn-whatsapp { background: #22c55e; }
-        .btn-call { background: #e11d48; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .app-header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: auto;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #219150;
+        }
+        .btn-search {
+            background-color: #2980b9;
+        }
+        .btn-search:hover {
+            background-color: #2471a3;
+        }
+        .result-box {
+            background-color: #e8f8f5;
+            padding: 12px;
+            border-left: 4px solid #27ae60;
+            margin-top: 10px;
+            display: none;
+        }
+        .error-box {
+            background-color: #fdedec;
+            color: #c0392b;
+            padding: 10px;
+            border-left: 4px solid #c0392b;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
+
     <div class="app-header">
-        <h2>Bhanu Public School & Jr College</h2>
+        <h2>Bhanu Public School</h2>
         <p>Gadala, Rajahmundry</p>
     </div>
+
     <div class="container">
+        <!-- Search Student Section -->
         <div class="card">
-            <h3>Quick Actions</h3>
-            <a href="tel:+919849800385" class="btn btn-call">📞 Call Admin (+91 98498 00385)</a>
-            <a href="https://wa.me/919849800385?text=Hello%20Admin,%20I%20would%20like%20to%20know%20more%20about%20admissions%20at%20Bhanu%20Public%20School" target="_blank" class="btn btn-whatsapp">💬 WhatsApp Admission Desk</a>
+            <h3>Search Student Details</h3>
+            <input type="text" id="searchInput" placeholder="Enter Student Name...">
+            <button class="btn-search" onclick="searchStudent()">Search</button>
+            
+            <div id="resultBox" class="result-box"></div>
+            <div id="errorBox" class="error-box">Student not found!</div>
         </div>
+
+        <!-- Add Student Section -->
         <div class="card">
-            <h3>Academics & Portals</h3>
-            <p>Access Classes 1st to 10th syllabus, Junior College MPC/BiPC/MEC/CEC streams, student attendance, and fee status.</p>
-            <a href="index.html" class="btn">Open Full Web App</a>
+            <h3>Add New Student</h3>
+            <input type="text" id="studentName" placeholder="Student Full Name" required>
+            <input type="text" id="studentClass" placeholder="Class (e.g., 5th Class)" required>
+            <input type="number" id="totalFee" placeholder="Total Fee (₹)" required>
+            <input type="number" id="paidFee" placeholder="Fee Paid (₹)" required>
+            <input type="tel" id="parentPhone" placeholder="Parent Phone Number" required>
+            <input type="text" id="address" placeholder="Address" required>
+            <button onclick="addStudent()">Save Student Details</button>
         </div>
     </div>
+
+    <script>
+        let students = JSON.parse(localStorage.getItem('bps_students')) || [
+            {
+                name: "Ravi Kumar",
+                studentClass: "10th Class",
+                totalFee: 15000,
+                paidFee: 10000,
+                parentPhone: "9848012345",
+                address: "Gadala, Rajahmundry"
+            }
+        ];
+
+        function saveToStorage() {
+            localStorage.setItem('bps_students', JSON.stringify(students));
+        }
+
+        function addStudent() {
+            const name = document.getElementById('studentName').value.trim();
+            const studentClass = document.getElementById('studentClass').value.trim();
+            const totalFee = parseFloat(document.getElementById('totalFee').value);
+            const paidFee = parseFloat(document.getElementById('paidFee').value);
+            const parentPhone = document.getElementById('parentPhone').value.trim();
+            const address = document.getElementById('address').value.trim();
+
+            if (!name || !studentClass || isNaN(totalFee) || isNaN(paidFee) || !parentPhone || !address) {
+                alert("Please fill all fields correctly.");
+                return;
+            }
+
+            students.push({
+                name,
+                studentClass,
+                totalFee,
+                paidFee,
+                parentPhone,
+                address
+            });
+
+            saveToStorage();
+            alert("Student added successfully!");
+
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClass').value = '';
+            document.getElementById('totalFee').value = '';
+            document.getElementById('paidFee').value = '';
+            document.getElementById('parentPhone').value = '';
+            document.getElementById('address').value = '';
+        }
+
+        function searchStudent() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const resultBox = document.getElementById('resultBox');
+            const errorBox = document.getElementById('errorBox');
+
+            resultBox.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            if (!query) return;
+
+            const matches = students.filter(s => s.name.toLowerCase().includes(query));
+
+            if (matches.length > 0) {
+                let html = '';
+                matches.forEach(s => {
+                    const remainingFee = s.totalFee - s.paidFee;
+                    html += `
+                        <p><strong>Name:</strong> ${s.name} (${s.studentClass})</p>
+                        <p><strong>Total Fee:</strong> ₹${s.totalFee}</p>
+                        <p><strong>Paid Fee:</strong> ₹${s.paidFee}</p>
+                        <p><strong>Remaining Fee:</strong> <span style="color: ${remainingFee > 0 ? 'red' : 'green'}; font-weight: bold;">₹${remainingFee}</span></p>
+                        <p><strong>Parent Phone:</strong> <a href="tel:${s.parentPhone}">${s.parentPhone}</a></p>
+                        <p><strong>Address:</strong> ${s.address}</p>
+                        <hr>
+                    `;
+                });
+                resultBox.innerHTML = html;
+                resultBox.style.display = 'block';
+            } else {
+                errorBox.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
+
